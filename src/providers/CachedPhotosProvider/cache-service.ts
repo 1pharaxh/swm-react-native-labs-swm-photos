@@ -1,4 +1,4 @@
-import { MMKV } from "react-native-mmkv";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MediaLibraryPhoto } from "../MediaLibraryPhotosProvider/useMediaLibraryPhotos";
 import { Platform } from "react-native";
 
@@ -13,9 +13,7 @@ type CacheKey = {
   mipmapWidth: number;
 };
 
-export const storage = new MMKV({
-  id: "photos-cache",
-});
+const STORAGE_PREFIX = "@photos-cache:";
 
 /**
  * Queries the cache for a photo.
@@ -27,7 +25,9 @@ export const getPhotoFromCache = async (
     return;
   }
 
-  const cachedPhotoUri = storage.getString(cacheKeyToString(photoKey));
+  const cachedPhotoUri = await AsyncStorage.getItem(
+    STORAGE_PREFIX + cacheKeyToString(photoKey),
+  );
   if (!cachedPhotoUri) {
     return;
   }
@@ -54,19 +54,22 @@ export const getPhotoFromCache = async (
  * Clears the cache effectively wiping out all stored photos.
  */
 export const clearCache = async () => {
-  storage.clearAll();
+  const keys = await AsyncStorage.getAllKeys();
+  const cacheKeys = keys.filter((key) => key.startsWith(STORAGE_PREFIX));
+  await AsyncStorage.multiRemove(cacheKeys);
 };
 
 /**
  * Loads all photos from the cache that match the {@link mipmapWidth} and {@link mediaLibraryPhotos} unless there's no match even for a single photo.
  * @returns photos that match the {@link mipmapWidth}
  */
-export const loadAllPhotosFromCache = (
+export const loadAllPhotosFromCache = async (
   mediaLibraryPhotos: MediaLibraryPhoto[],
   mipmapWidth: number,
-): CachedPhotoType[] => {
-  const results = storage.getAllKeys();
-  const pairs = results.map((key) => [key, storage.getString(key)]);
+): Promise<CachedPhotoType[]> => {
+  const allKeys = await AsyncStorage.getAllKeys();
+  const cacheKeys = allKeys.filter((key) => key.startsWith(STORAGE_PREFIX));
+  const pairs = await AsyncStorage.multiGet(cacheKeys);
 
   const sizeMatchingPhotos = pairs
     .map((pair) => {
@@ -74,7 +77,9 @@ export const loadAllPhotosFromCache = (
         return;
       }
 
-      const { originalPhotoUri, mipmapWidth } = cacheKeyFromString(pair[0]);
+      const keyWithoutPrefix = pair[0].replace(STORAGE_PREFIX, "");
+      const { originalPhotoUri, mipmapWidth } =
+        cacheKeyFromString(keyWithoutPrefix);
 
       return {
         originalPhotoUri,
@@ -112,7 +117,10 @@ export const loadAllPhotosFromCache = (
  * Checks if a photo is in the cache.
  */
 const existsInCache = async (cacheKey: CacheKey) => {
-  return Boolean(storage.getString(cacheKeyToString(cacheKey)));
+  const value = await AsyncStorage.getItem(
+    STORAGE_PREFIX + cacheKeyToString(cacheKey),
+  );
+  return Boolean(value);
 };
 
 const cacheKeyToString = (cacheKey: CacheKey): string => {
@@ -134,7 +142,10 @@ export const setPhotoInCache = async (
   cacheKey: CacheKey,
   cachedPhotoUri: string,
 ): Promise<CachedPhotoType> => {
-  storage.set(cacheKeyToString(cacheKey), cachedPhotoUri);
+  await AsyncStorage.setItem(
+    STORAGE_PREFIX + cacheKeyToString(cacheKey),
+    cachedPhotoUri,
+  );
 
   return {
     originalPhotoUri: cacheKey.originalPhotoUri,

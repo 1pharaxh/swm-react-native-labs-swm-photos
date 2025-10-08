@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { MMKV } from "react-native-mmkv";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const storage = new MMKV({
-  id: "persisted-state",
-});
+const STORAGE_PREFIX = "@persisted-state:";
 
 export type PersistedStateStatus = "RESTORING" | "IN_MEMORY";
 
@@ -28,7 +26,7 @@ export function usePersistedState<T>(key: string, initialValue: T) {
   useEffect(() => {
     const restorePersistedState = async () => {
       try {
-        const persistedValue = storage.getString(key);
+        const persistedValue = await AsyncStorage.getItem(STORAGE_PREFIX + key);
 
         // console.log(`${key}: persisted value: ${persistedValue}`);
 
@@ -86,7 +84,7 @@ export function usePersistedState<T>(key: string, initialValue: T) {
             : state;
 
         // trigger asynchronous save
-        setTimeout(() => saveToStorage(key, value), 0);
+        setTimeout(async () => await saveToStorage(key, value), 0);
 
         return {
           ...prev,
@@ -100,11 +98,11 @@ export function usePersistedState<T>(key: string, initialValue: T) {
   return [value, setStateAndPersist, restorationStatus] as const;
 }
 
-const saveToStorage = (key: string, value: any) => {
+const saveToStorage = async (key: string, value: any) => {
   try {
     const valueToStore =
       typeof value === "object" ? JSON.stringify(value) : String(value);
-    storage.set(key, valueToStore);
+    await AsyncStorage.setItem(STORAGE_PREFIX + key, valueToStore);
   } catch (error) {
     logger.main.error(`Failed to persist value for key "${key}":`, error);
   }

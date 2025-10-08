@@ -10,6 +10,12 @@ module.exports = defineConfig([
     rules: {
       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
       "no-console": "error",
+      "prettier/prettier": [
+        "error",
+        {
+          endOfLine: "auto",
+        },
+      ],
     },
   },
 ]);

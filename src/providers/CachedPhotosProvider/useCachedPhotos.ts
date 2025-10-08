@@ -198,33 +198,32 @@ export const useCachedPhotos = () => {
       cachedPhotosLoadingState: "RESTORING_FROM_CACHE",
     });
 
-    const cachedPhotos = loadAllPhotosFromCache(
-      mediaLibraryPhotos,
-      targetImageSize,
+    loadAllPhotosFromCache(mediaLibraryPhotos, targetImageSize).then(
+      (cachedPhotos) => {
+        if (cachedPhotos.length === 0) {
+          logger.cachedPhotos.info(
+            "❌ No cached photos found. Will calculate cache.",
+          );
+          setState({
+            cachedPhotos: [],
+            cachedPhotosLoadingState: "RESTORED_FROM_CACHE",
+          });
+          return;
+        }
+
+        logger.cachedPhotos.info(
+          `📤 Restored all ${cachedPhotos.length} cached photos from disk`,
+        );
+
+        setState({
+          cachedPhotos,
+          cachedPhotosLoadingState:
+            cachedPhotos.length === mediaLibraryPhotos.length
+              ? "COMPLETED"
+              : "RESTORED_FROM_CACHE",
+        });
+      },
     );
-
-    if (cachedPhotos.length === 0) {
-      logger.cachedPhotos.info(
-        "❌ No cached photos found. Will calculate cache.",
-      );
-      setState({
-        cachedPhotos: [],
-        cachedPhotosLoadingState: "RESTORED_FROM_CACHE",
-      });
-      return;
-    }
-
-    logger.cachedPhotos.info(
-      `📤 Restored all ${cachedPhotos.length} cached photos from disk`,
-    );
-
-    setState({
-      cachedPhotos,
-      cachedPhotosLoadingState:
-        cachedPhotos.length === mediaLibraryPhotos.length
-          ? "COMPLETED"
-          : "RESTORED_FROM_CACHE",
-    });
   }, [
     galleryUISettingsStateRestorationStatus,
     mediaLibraryStateRestorationStatus,
