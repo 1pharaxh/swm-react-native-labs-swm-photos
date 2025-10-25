@@ -60,22 +60,6 @@ export default {
           fonts: ["./assets/fonts/Aeonik-Medium.ttf"],
         },
       ],
-      ["./config-plugins/withProfileable"],
-      [
-        "@react-native-tvos/config-tv",
-        {
-          appleTVImages: {
-            icon: "./assets/images/tvos-icon.png",
-            iconSmall: "./assets/images/tvos-iconSmall.png",
-            iconSmall2x: "./assets/images/tvos-iconSmall2x.png",
-            topShelf: "./assets/images/tvos-topShelf.png",
-            topShelf2x: "./assets/images/tvos-topShelf2x.png",
-            topShelfWide: "./assets/images/tvos-topShelfWide.png",
-            topShelfWide2x: "./assets/images/tvos-topShelfWide2x.png",
-          },
-          androidTVIcon: "./assets/images/adaptive-icon.png",
-        },
-      ],
     ],
     experiments: {
       typedRoutes: true,

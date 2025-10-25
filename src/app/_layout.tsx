@@ -6,6 +6,7 @@ import { MediaLibraryPhotosProvider } from "@/providers/MediaLibraryPhotosProvid
 import { ScreenDimensionsProvider } from "@/providers/ScreenDimensionsProvider";
 import "@/utils/logger";
 import { FocusRefProvider } from "@/providers/FocusRefProvider";
+import "../../global.css";
 
 /**
  * We call `SplashScreen.hide` in the `index.tsx` file once the app layout is ready.

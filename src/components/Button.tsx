@@ -75,26 +75,6 @@ export const Button = ({
     opacity: pulseTransparency.value,
   }));
 
-  // Special case - TV
-  // - (Android TV, FireTV) Using Animated style directly on TouchableOpacity causes some problems with focusing after clicking the button
-  //                        The code below is a workaround for the mentioned issue
-  if (Platform.isTV) {
-    return (
-      // @ts-ignore
-      <TouchableOpacity
-        onPress={pressWrapper}
-        {...props}
-        style={{ width: "100%" }}
-      >
-        <Animated.View style={[styles.button, animatedBackground, style]}>
-          <Text style={[styles.text, invert && styles.invertColor]}>
-            {children}
-          </Text>
-        </Animated.View>
-      </TouchableOpacity>
-    );
-  }
-
   return (
     // @ts-ignore
     <AnimatedPressable

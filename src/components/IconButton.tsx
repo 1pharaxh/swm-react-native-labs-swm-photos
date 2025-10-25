@@ -57,22 +57,6 @@ export function IconButton({
     if (animate) scale.value = withSpring(1, { stiffness: 300, damping: 10 });
   };
 
-  // TV-specific styles to maintain consistent colors when focused
-  const tvFocusOverride =
-    Platform.isTV && isFocused
-      ? {
-          backgroundColor:
-            style?.backgroundColor || styles.buttonContainer.backgroundColor,
-        }
-      : {};
-
-  const tvIconOverride =
-    Platform.isTV && isFocused
-      ? {
-          tintColor: iconStyle?.tintColor || styles.buttonIcon.tintColor,
-        }
-      : {};
-
   // Scale animation style
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -86,12 +70,9 @@ export function IconButton({
         onPress={onPress}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        style={[styles.buttonContainer, style, tvFocusOverride]}
+        style={[styles.buttonContainer, style]}
       >
-        <Image
-          source={iconSource}
-          style={[styles.buttonIcon, iconStyle, tvIconOverride]}
-        />
+        <Image source={iconSource} style={[styles.buttonIcon, iconStyle]} />
       </TouchableOpacity>
     </Animated.View>
   );
@@ -113,9 +94,6 @@ const styles = StyleSheet.create({
     width: scaledPixels(52),
     height: scaledPixels(52),
     tintColor: colors.blue,
-    filter:
-      Platform.OS === "web"
-        ? `invert(4%) sepia(100%) saturate(7000%) hue-rotate(220deg)`
-        : undefined,
+    filter: undefined,
   },
 });

@@ -1,26 +1,10 @@
-// Learn more https://docs.expo.io/guides/customizing-metro
 const { getDefaultConfig } = require("expo/metro-config");
+const { withNativewind } = require("nativewind/metro");
 
 /** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(__dirname);
+const config = getDefaultConfig(__dirname, {
+  // Do not disable CSS support when using Tailwind.
+  isCSSEnabled: true,
+});
 
-// Add wasm asset support
-config.resolver.assetExts.push("wasm");
-
-if (process.env.EXPO_TV) {
-  config.resolver.sourceExts = [
-    ...(config.resolver.sourceExts || []).map((ext) => `tv.${ext}`),
-    ...(config.resolver.sourceExts || []),
-  ];
-}
-
-// Add COEP and COOP headers to support SharedArrayBuffer
-config.server.enhanceMiddleware = (middleware) => {
-  return (req, res, next) => {
-    res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
-    res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-    middleware(req, res, next);
-  };
-};
-
-module.exports = config;
+module.exports = withNativewind(config);

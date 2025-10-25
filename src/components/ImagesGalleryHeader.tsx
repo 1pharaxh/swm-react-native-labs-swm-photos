@@ -68,7 +68,6 @@ export const ImagesGalleryHeader = ({
           <Link href="/settings" asChild>
             <IconButton
               iconSource={require("@/assets/images/settings-icon.png")}
-              animate={Platform.isTV}
               ref={focusRefs["settings"]}
             />
           </Link>

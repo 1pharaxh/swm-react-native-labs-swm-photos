@@ -72,7 +72,7 @@ export const ImagesGalleryList = ({
     [calculateSingleImageSize, calculateOffscreenDrawDistanceFromWindowSize],
   );
 
-  const Image = Platform.isTV ? FocusableImage : ImageComponent;
+  const Image = ImageComponent;
 
   // Determine if we should show the "No Photos" message
   const shouldShowNoPhotosMessage =
@@ -120,21 +120,10 @@ export const ImagesGalleryList = ({
       item: (typeof cachedPhotos)[number];
       index: number;
     }) => {
-      // Since only TV uses FocusableImage component, only TV has focusable props here
-      const focusProps = Platform.isTV
-        ? {
-            nextFocusLeft:
-              index % numberOfColumns === 0 ? settingsButtonHandle : undefined,
-            nextFocusUp:
-              index < numberOfColumns ? settingsButtonHandle : undefined,
-          }
-        : {};
-
       return (
         <Image
           uri={item.cachedPhotoUri}
           itemSize={properties.singleImageSize}
-          {...focusProps}
         />
       );
     },
@@ -164,7 +153,7 @@ export const ImagesGalleryList = ({
   return (
     <View style={[styles.listContainer, style]}>
       <FlashList
-        key={mediaLibraryLoadingState}    // Temporary solution to prevent empty list crash
+        key={mediaLibraryLoadingState} // Temporary solution to prevent empty list crash
         data={cachedPhotos}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
@@ -175,7 +164,7 @@ export const ImagesGalleryList = ({
           ...(IS_WIDE_SCREEN && {
             paddingLeft: galleryGap + dimensions.width * 0.05,
             paddingRight: dimensions.width * 0.05,
-            paddingTop: Platform.isTV ? scaledPixels(20) : 0,
+            paddingTop: 0,
           }),
         }}
         /**
